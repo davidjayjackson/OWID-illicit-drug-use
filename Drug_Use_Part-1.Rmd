@@ -2,7 +2,10 @@
 title: 'OWID: Opioid Deaths Part 1'
 author: "David Jackson"
 date: "02/01/2021 8:00 PM/EST"
-output: html_document
+output: 
+  html_document: 
+    fig_width: 9
+    fig_height: 7
 ---
 
 ```{r setup, include=FALSE}
@@ -19,37 +22,75 @@ library(pracma) # Various moving averages
 ```
 
 ## Our world In Data (http://ourworldindata.org)
+* "Opioid overdoses were by far the most common in the United States, at 13.3 deaths per 100,000. This was twice as high as the second country – Libya – at 7 deaths per 100,000. And the US rate is up to 40-times higher than in some countries in Europe (like Italy, Poland or Hungary)".
 
 ```{r}
 opioid_rate <- read_csv("./DATA/death-rate-from-opioid-use.csv") %>%
   rename("Deaths" = "Opioid_deaths") %>% 
-  rename("Country" = "Entity") %>%glimpse()
+  rename("Country" = "Entity") 
+opioid_rate %>% select(Deaths) %>% skim() # Add to Part 2
 ```
 
 ### Calc and Plot Yearly Death Rate
 
 ```{r}
+opioid_rate$Total <- opioid_rate$Deaths * 100000
+
 opioid_yearly <- opioid_rate %>% group_by(Year) %>% summarise(
-                        Rate = sum(Deaths),
-                        Average = mean(Deaths)
+                        Totalper = sum(Deaths),
+                        AvgYear = mean(Deaths),
+                        TotalYear = sum(Total),
+                        TotalAVg = mean(Total)
 )
 ```
 ```{r}
-opioid_yearly %>% ggplot() + geom_line(aes(x=Year,y=Average)) +
-  scale_y_continuous(labels=percent) + 
-  labs(title="Worldwide Opioid Death Pecent by Year",y="Percent of Deaths")
+opioid_yearly %>% ggplot() + geom_line(aes(x=Year,y=Totalper)) +
+  scale_y_continuous(labels=comma) + 
+  labs(title="Worldwide Opioid Deaths by Year",y=" Deaths per 100,000")
+```
+```{r}
+
+opioid_yearly %>% ggplot() + geom_line(aes(x=Year,y=TotalYear)) +
+  scale_y_continuous(labels=comma) + 
+  labs(title="Worldwide Opioid Deaths by Year")
+
 ```
 ```{r}
 country_totals <- opioid_rate %>% group_by(Country) %>% summarise(
-                        Rate = sum(Deaths),
-                        Average = mean(Deaths))
+                        Totalper = sum(Deaths),
+                        AvgYear = mean(Deaths),
+                        TotalYear = sum(Total),
+                        TotalAVg = mean(Total)
+)
 ```
 
 ### Calc and plot Top 10 Countries (Death Rate)
 
 ```{r}
-country_totals %>% filter(Average >=3) %>% 
-  ggplot() + geom_col(aes(x=reorder(Country,Average),y=Average)) + coord_flip() +
-  scale_y_continuous(labels=percent) + labs(title="Top 10 Countries by Percent Increase")
+country_totals %>% filter(Totalper >=87.00965) %>% 
+  ggplot() + geom_col(aes(x=reorder(Country,Totalper),y=Totalper)) + coord_flip() +
+  scale_y_continuous(labels=comma) + labs(title="Top 10 Countries by Deaths",
+                                            y="Deaths Per 100,000")
 ```
+### Numbers by Selected Country
 
+```{r}
+opioid_rate %>% filter(Country %in% c("Libya","United States","Russia","North America",
+                                      "United Arab Emirates","South Africa","Eastern Europe",
+                                      "Estonia","Scotland","Southern Sub-Saharan Africa")) %>%
+  
+  ggplot() + geom_col(aes(x=Year,y=Deaths,fill=Deaths)) + facet_wrap(~Country,scale="free_y",ncol=2) +
+  labs(title="Top 10 Countries by Deaths",y="Deaths per 100,000")
+```
+### Plots of US Opioid Deaths
+
+```{r}
+opioid_rate %>% filter(Country =="United States") %>%
+  ggplot() + geom_col(aes(Year,y=Deaths,col=Deaths),lwd=2) + labs(title="Us Opioid Deaths per 100,000")
+```
+```{r}
+opioid_rate %>% filter(Country =="United States") %>%
+  ggplot() + geom_col(aes(Year,y=Total,col=Total),lwd=2) + 
+  labs(title="Us Total Opioid Deaths by Year(1990 - 2016") +
+  scale_y_continuous(labels = comma)
+```
