@@ -1,7 +1,7 @@
 ---
 title: 'OWID: Drug Overdose Deaths'
 author: "IllicitDavid Jackson"
-date: "2/4/2021"
+date: "2/4/2021 06:15 PM/EST"
 output: html_document
 ---
 
@@ -35,36 +35,41 @@ overdose_deaths %>%skim()
 ```{r}
 overdose_deaths$Total <- overdose_deaths$Opioid + overdose_deaths$Cocaine + overdose_deaths$Amphetamine + overdose_deaths$Other_drug
 
-overdose_year <- overdose_deaths %>% group_by(Year) %>%
-          summarise(across(Opioid:Total,sum))
+
 ```
+
 # Plot Total Drug Overdose Death by Year
 
 ```{r}
-overdose_year %>% ggplot(aes(x=Year,y=Total)) + geom_line() +
+p0 <-overdose_deaths %>% ggplot(aes(x=Year,y=Total)) + geom_col() +
   scale_y_continuous(labels=comma) +
   labs(title="Worldwide Total Deaths Do To Drug Overdoses",y="Total Drug Overdose Deaths")
+ggplotly(p0)
 ```
 
 # Deaths by Drug and Year
 
 ```{r}
-overdose_year %>% ggplot(aes(x=Year,y=Opioid)) + geom_line() +
+p1 <-overdose_deaths %>% ggplot(aes(x=Year,y=Opioid)) + geom_col() +
   scale_y_continuous(labels=comma) +
   labs(title="Worldwide Total Deaths Opioid Drug Overdoses",y="Total Drug Overdose Deaths")
+ggplotly(p1)
 ```
 ```{r}
-overdose_year %>% ggplot(aes(x=Year,y=Cocaine)) + geom_line() +
+p2 <-overdose_deaths %>% ggplot(aes(x=Year,y=Cocaine)) + geom_col() +
   scale_y_continuous(labels=comma) +
   labs(title="Worldwide Total Deaths  Drug Cocaine Overdoses",y="Total Drug Overdose Deaths")
+ggplotly(p2)
 ```
 ```{r}
-overdose_year %>% ggplot(aes(x=Year,y=Amphetamine)) + geom_line() +
+p3 <- overdose_deaths %>% ggplot(aes(x=Year,y=Amphetamine)) + geom_col() +
   scale_y_continuous(labels=comma) +
   labs(title="Worldwide Total Deaths  Amphetamine Overdoses",y="Total Drug Overdose Deaths")
+ggplotly(p3)
 ```
 ```{r}
-overdose_year %>% ggplot(aes(x=Year,y=Other_drug)) + geom_line() +
+p4 <- overdose_deaths %>% ggplot(aes(x=Year,y=Other_drug)) + geom_col() +
   scale_y_continuous(labels=comma) +
   labs(title="Worldwide Total Deaths Other Drugs Overdoses",y="Total Drug Overdose Deaths")
+ggplotly(p4)
 ```
