@@ -1,0 +1,70 @@
+---
+title: 'OWID: Drug Overdose Deaths'
+author: "IllicitDavid Jackson"
+date: "2/4/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE,message = FALSE,error = FALSE)
+library(ggplot2)
+library(scales)
+library(plotly)
+library(dplyr)
+library(readr)
+library(tidyr)
+library(forcats)
+library(skimr)
+library(pracma) # Various moving averages
+```
+
+# Drug Overdose Deaths: OUr World In Data (http://ourworldindata.org)
+* Death rates from drug overdoses in the United States, measured as the number of deaths per 100,000 individuals (of all ages, not age-standardized).
+
+```{r}
+rm(list=ls())
+overdose_deaths <- read_csv("./DATA/deaths-drug-overdoses.csv") %>%
+  rename("Country" = "Entity") %>% filter(Country == "World")
+
+```
+```{r}
+overdose_deaths %>%skim()
+```
+# Calculate Total Deaths by Drug and Year
+
+```{r}
+overdose_deaths$Total <- overdose_deaths$Opioid + overdose_deaths$Cocaine + overdose_deaths$Amphetamine + overdose_deaths$Other_drug
+
+overdose_year <- overdose_deaths %>% group_by(Year) %>%
+          summarise(across(Opioid:Total,sum))
+```
+# Plot Total Drug Overdose Death by Year
+
+```{r}
+overdose_year %>% ggplot(aes(x=Year,y=Total)) + geom_line() +
+  scale_y_continuous(labels=comma) +
+  labs(title="Worldwide Total Deaths Do To Drug Overdoses",y="Total Drug Overdose Deaths")
+```
+
+# Deaths by Drug and Year
+
+```{r}
+overdose_year %>% ggplot(aes(x=Year,y=Opioid)) + geom_line() +
+  scale_y_continuous(labels=comma) +
+  labs(title="Worldwide Total Deaths Opioid Drug Overdoses",y="Total Drug Overdose Deaths")
+```
+```{r}
+overdose_year %>% ggplot(aes(x=Year,y=Cocaine)) + geom_line() +
+  scale_y_continuous(labels=comma) +
+  labs(title="Worldwide Total Deaths  Drug Cocaine Overdoses",y="Total Drug Overdose Deaths")
+```
+```{r}
+overdose_year %>% ggplot(aes(x=Year,y=Amphetamine)) + geom_line() +
+  scale_y_continuous(labels=comma) +
+  labs(title="Worldwide Total Deaths  Amphetamine Overdoses",y="Total Drug Overdose Deaths")
+```
+```{r}
+overdose_year %>% ggplot(aes(x=Year,y=Other_drug)) + geom_line() +
+  scale_y_continuous(labels=comma) +
+  labs(title="Worldwide Total Deaths Other Drugs Overdoses",y="Total Drug Overdose Deaths")
+```
