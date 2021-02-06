@@ -104,10 +104,10 @@ od_longer <- pivot_longer(overdose_world,
 
 ```{r}
 od_longer %>% filter(name !="Total") %>% ggplot() + geom_line(aes(x=Year,y=value,col=name)) + scale_y_log10(labels=comma) +
-  labs(title="Worldwide Overdoes Deaths by Drug and Year",y="Deaths Do TO Overdose")
+  labs(title="Worldwide Overdoes Deaths by Drug and Year",y="Deaths Do TO Overdose") + guides(color = guide_legend(override.aes = list(size = 2)))
 ```
 
 ```{r}
 od_longer %>% filter(name !="Total") %>% ggplot() + geom_line(aes(x=Year,y=value/sum(value),col=name)) +
-  labs(title="Worldwide Overdoes Deaths by Drug and Year",y=" % of Deaths Do TO Overdose") + scale_y_continuous(labels=percent)
+  labs(title="Worldwide Overdoes Deaths by Drug and Year",y=" % of Deaths Do TO Overdose") + scale_y_continuous(labels=percent) + guides(color = guide_legend(override.aes = list(size = 2)))
 ```
