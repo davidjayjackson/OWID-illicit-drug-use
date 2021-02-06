@@ -14,8 +14,18 @@ library(dplyr)
 library(readr)
 library(tidyr)
 library(forcats)
-library(skimr)
+library(skimr) #Julia Silge 
 library(pracma) # Various moving averages
+```
+```{r}
+## Packages needed for creating maps
+library(maps)
+library(mapproj)
+library(sf)
+library(tmap)
+library(tmaptools)
+library(leaflet)
+# options(scipen=999)
 ```
 
 # Drug Overdose Deaths: OUr World In Data (http://ourworldindata.org)
@@ -23,25 +33,19 @@ library(pracma) # Various moving averages
 
 ```{r}
 rm(list=ls())
-overdose_deaths <- read_csv("./DATA/deaths-drug-overdoses.csv") %>%
-  rename("Country" = "Entity") %>% filter(Country == "World")
+overdose_data <- read_csv("./DATA/deaths-drug-overdoses.csv") %>%
+  rename("Country" = "Entity") 
 
-```
-```{r}
-overdose_deaths %>%skim()
-```
-# Calculate Total Deaths by Drug and Year
+overdose_data$Total <- overdose_data$Opioid + overdose_data$Cocaine + overdose_data$Amphetamine + overdose_data$Other_drug
 
-```{r}
-overdose_deaths$Total <- overdose_deaths$Opioid + overdose_deaths$Cocaine + overdose_deaths$Amphetamine + overdose_deaths$Other_drug
-
-
+overdose_world <-overdose_data %>%   filter(Country =="World")
+overdose_not_world <-overdose_data %>%   filter(Country !="World")
 ```
 
 # Plot Total Drug Overdose Death by Year
 
 ```{r}
-p0 <-overdose_deaths %>% ggplot(aes(x=Year,y=Total)) + geom_col() +
+p0 <-overdose_world %>% ggplot(aes(x=Year,y=Total)) + geom_col() +
   scale_y_continuous(labels=comma) +
   labs(title="Worldwide Total Deaths Do To Drug Overdoses",y="Total Drug Overdose Deaths")
 ggplotly(p0)
@@ -50,26 +54,60 @@ ggplotly(p0)
 # Deaths by Drug and Year
 
 ```{r}
-p1 <-overdose_deaths %>% ggplot(aes(x=Year,y=Opioid)) + geom_col() +
+p1 <-overdose_world %>% ggplot(aes(x=Year,y=Opioid)) + geom_col() +
   scale_y_continuous(labels=comma) +
   labs(title="Worldwide Total Deaths Opioid Drug Overdoses",y="Total Drug Overdose Deaths")
 ggplotly(p1)
 ```
 ```{r}
-p2 <-overdose_deaths %>% ggplot(aes(x=Year,y=Cocaine)) + geom_col() +
+p2 <-overdose_world %>% ggplot(aes(x=Year,y=Cocaine)) + geom_col() +
   scale_y_continuous(labels=comma) +
   labs(title="Worldwide Total Deaths  Drug Cocaine Overdoses",y="Total Drug Overdose Deaths")
 ggplotly(p2)
 ```
 ```{r}
-p3 <- overdose_deaths %>% ggplot(aes(x=Year,y=Amphetamine)) + geom_col() +
+p3 <- overdose_world %>% ggplot(aes(x=Year,y=Amphetamine)) + geom_col() +
   scale_y_continuous(labels=comma) +
   labs(title="Worldwide Total Deaths  Amphetamine Overdoses",y="Total Drug Overdose Deaths")
 ggplotly(p3)
 ```
 ```{r}
-p4 <- overdose_deaths %>% ggplot(aes(x=Year,y=Other_drug)) + geom_col() +
+p4 <- overdose_world %>% ggplot(aes(x=Year,y=Other_drug)) + geom_col() +
   scale_y_continuous(labels=comma) +
   labs(title="Worldwide Total Deaths Other Drugs Overdoses",y="Total Drug Overdose Deaths")
 ggplotly(p4)
+```
+
+
+# Part 2: Use Pivot_wider and plot 
+
+
+```{r}
+od_countrydeaths <- overdose_not_world  %>% group_by(Country) %>%
+  summarise(across(Opioid:Total,sum))
+
+```
+```{r}
+# world_tbl <- map_data("world") %>%
+#     as_tibble() %>% rename("Country" = "region") 
+# 
+# 
+# world_join <-   right_join(world_tbl,od_countrydeath)
+# world_join <- world_join %>% select(-group,-order,-subregion)
+```
+```{r}
+od_longer <- pivot_longer(overdose_world,
+                         cols=c("Opioid","Cocaine","Amphetamine","Other_drug","Total"))
+```
+
+### Plot of Drug Total by Year 
+
+```{r}
+od_longer %>% filter(name !="Total") %>% ggplot() + geom_line(aes(x=Year,y=value,col=name)) + scale_y_log10(labels=comma) +
+  labs(title="Worldwide Overdoes Deaths by Drug and Year",y="Deaths Do TO Overdose")
+```
+
+```{r}
+od_longer %>% filter(name !="Total") %>% ggplot() + geom_line(aes(x=Year,y=value/sum(value),col=name)) +
+  labs(title="Worldwide Overdoes Deaths by Drug and Year",y=" % of Deaths Do TO Overdose") + scale_y_continuous(labels=percent)
 ```
