@@ -1,0 +1,60 @@
+---
+title: "Map it Dano"
+author: "IllicitDavid Jackson"
+date: "2/8/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(scales)
+library(plotly)
+library(dplyr)
+library(readr)
+library(tidyr)
+library(forcats)
+library(skimr) #Julia Silge 
+library(pracma) # Various moving averages
+library(maps)
+library(mapproj)
+library(sf)
+library(tmap)
+library(tmaptools)
+library(leaflet)
+
+```
+
+## Grab OD World data
+
+```{r}
+rm(list=ls())
+overdose_data <- read_csv("./DATA/deaths-drug-overdoses.csv") %>%
+  rename("Country" = "Entity") 
+
+overdose_data$Total <- overdose_data$Opioid + overdose_data$Cocaine + overdose_data$Amphetamine + overdose_data$Other_drug
+
+overdose_world <-overdose_data %>%   filter(Country !="World")
+overdose_us <-overdose_data %>%   filter(Country =="United States")
+```
+### Pivot Longer Us Data
+
+# Part 2: Use Pivot_wider and plot 
+
+
+```{r}
+od_country <- overdose_world  %>% group_by(Country) %>%
+  summarise(across(Opioid:Total,sum)) 
+ 
+```
+```{r}
+world_tbl <- ggplot2::map_data("world") %>%
+     as_tibble() %>% rename("Country" = "region") %>%
+  select(Country,long,lat) 
+
+```
+```{r}
+
+world_join <-   right_join(world_tbl,od_country)
+world_join <- world_join %>% select(-group,-order,-subregion)
+```
