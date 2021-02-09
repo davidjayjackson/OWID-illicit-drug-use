@@ -108,8 +108,8 @@ od_longer %>% filter(name !="Total") %>% ggplot() + geom_line(aes(x=Year,y=value
 ```
 
 ```{r}
-od_longer %>% filter(name !="Total") %>% ggplot() + geom_line(aes(x=Year,y=value/sum(value),col=name)) +
-  labs(title="Worldwide Overdoes Deaths by Drug and Year",y=" % of Deaths Do TO Overdose") + scale_y_continuous(labels=percent) + guides(color = guide_legend(override.aes = list(size = 2)))
+# od_longer %>% filter(name !="Total") %>% ggplot() + geom_line(aes(x=Year,y=value/sum(value),col=name)) +
+#   labs(title="Worldwide Overdoes Deaths by Drug and Year",y=" % of Deaths Do TO Overdose") + scale_y_continuous(labels=percent) + guides(color = guide_legend(override.aes = list(size = 2)))
 ```
 
 ## US Overdose Deaths from Opioid, Cocaine, Amphetamine and Other Drugs
@@ -176,8 +176,8 @@ us_longer %>% filter(name !="Total") %>% ggplot() + geom_line(aes(x=Year,y=value
 ```
 
 ```{r}
-us_longer %>% filter(name !="Total") %>% ggplot() + geom_line(aes(x=Year,y=value/sum(value),col=name)) +
-  labs(title="USA Overdoes Deaths by Drug and Year",y=" % of Deaths Do TO Overdose") + scale_y_continuous(labels=percent) + guides(color = guide_legend(override.aes = list(size = 2)))
+# us_longer %>% filter(name !="Total") %>% ggplot() + geom_line(aes(x=Year,y=value/sum(value),col=name)) +
+#   labs(title="USA Overdoes Deaths by Drug and Year",y=" % of Deaths Do TO Overdose") + scale_y_continuous(labels=percent) + guides(color = guide_legend(override.aes = list(size = 2)))
 ```
 
 ## Percent by Overdose Deaths by Year
@@ -188,7 +188,7 @@ group_by(Year) %>% mutate(Total = sum(value)) %>%
   ggplot() + geom_line(aes(x=Year,y=value/Total,col=name))  +
   scale_y_continuous(labels=percent) +
   labs(title="US Pecent of OD Deaths by Drug and Year",y="Percent of Total OD Deaths")  + guides(color = guide_legend(override.aes = list(size = 2)))
-  
+
 
 ```
 
