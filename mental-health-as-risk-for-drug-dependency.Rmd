@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 library(ggplot2) 
 library(scales)
 library(dplyr)
-library(forcats)
+library(ggtext)
 ```
 
 ## mental-health-as-risk-for-drug-dependency
@@ -34,7 +34,7 @@ colnames(mental_head_risk) <- c("Disorder","Risk")
 ```{r}
 mental_head_risk  %>% ggplot() + geom_col(aes(x=reorder(Disorder,Risk),y=Risk)) +
   coord_flip() + labs(title="Mental Health as Risk For Drug Dependency",
-                      x="Mental Disorders") 
-
+                      x="Mental Disorders") +
+  geom_text(aes(x=Disorder,y=Risk,label=Risk),nudge_y = 0.5)
 ```
 
